@@ -3,6 +3,6 @@ using std::cout, std::endl;
 
 int main()
 {
-    cout << "Hello Bitchas!" << endl;
+    cout << "Hello World!" << endl;
     return 0;
 }
