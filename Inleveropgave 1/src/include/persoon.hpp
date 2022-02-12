@@ -15,8 +15,10 @@ public:
     Persoon();
     Persoon(string naam, double budet);
     friend ostream & operator<<(ostream & os, const Persoon & mc);
-    void koop(Game videogame);
-    void verkoop(Game videogame, Persoon koper);
+    void koop(const Game& videogame);
+    void verkoop(const Game& videogame, Persoon koper);
     string get_naam() const;
     double get_budget() const;
+    void set_budget(double new_budget);
+    void add_game(const Game& videogame);
 };

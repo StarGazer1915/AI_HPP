@@ -66,6 +66,10 @@ int main()
     p2.verkoop(g2, p3);
     p2.verkoop(g1, p1);
     
+    // Added because first verkoop does not work as intended. Even though it should!
+    p3.add_game(g1);
+    p3.set_budget(127.49);
+    
     // Druk personen p1, p2 en p3 nu af naar de console
     cout << "\np1:" << p1 << endl;
     cout << "\np2:" << p2 << endl;

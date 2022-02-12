@@ -1,5 +1,4 @@
 #include <iostream>
-#include <math.h>
 #include "include/persoon.hpp"
 
 using std::cout, std::string, std::ostream, std::vector;
@@ -19,7 +18,7 @@ ostream & operator<<(ostream & os, const Persoon & ob) {
     return os;
 }
 
-void Persoon::koop(Game videogame) {
+void Persoon::koop(const Game& videogame) {
     if (videogame.get_prijs() < budget) {
         for(auto & game : this->games) {
             if (game.get_naam() == videogame.get_naam()) {
@@ -36,7 +35,7 @@ void Persoon::koop(Game videogame) {
     }
 }
 
-void Persoon::verkoop(Game videogame, Persoon koper) {
+void Persoon::verkoop(const Game& videogame, Persoon koper) {
     if (videogame.get_oudprijs() < koper.get_budget()) {
         bool canSell = false;
         for(auto & game : this->games) {
@@ -44,7 +43,7 @@ void Persoon::verkoop(Game videogame, Persoon koper) {
                 canSell = true;
             }
         }
-        if (canSell == false) {
+        if (!canSell) {
             cout << "'" << this->naam << "' verkoopt '" << videogame.get_naam() << " NIET aan " << koper.get_naam() << "' (niet in bezit)\n";
             return;
         }
@@ -56,7 +55,7 @@ void Persoon::verkoop(Game videogame, Persoon koper) {
             }
         }
 
-        koper.games.push_back(videogame);
+        koper.add_game(videogame);
         cout << "'" << this->naam << "' verkoopt '" << videogame.get_naam() << "' aan " << koper.get_naam() << "\n";
         
         for(int i = 0; i < this->games.size(); i++) {
@@ -79,4 +78,12 @@ string Persoon::get_naam() const {
 
 double Persoon::get_budget() const {
     return this->budget;
+}
+
+void Persoon::set_budget(double new_budget) {
+    this->budget = new_budget;
+}
+
+void Persoon::add_game(const Game& videogame) {
+    this->games.push_back(videogame);
 }
