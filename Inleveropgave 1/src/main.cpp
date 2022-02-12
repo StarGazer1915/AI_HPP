@@ -42,6 +42,12 @@ int main()
     Persoon p2("Hans", 55);
     Persoon p3("Arno", 185);
     
+
+    // Druk personen p1, p2 en p3 nu af naar de console
+    cout << "\np1:" << p1 << endl;
+    cout << "\np2:" << p2 << endl;
+    cout << "\np3:" << p3 << endl;
+    
     // Druk de volgende transacties af (pas de code aan)
     p1.koop(g1);
     p1.koop(g2);
@@ -49,7 +55,7 @@ int main()
     p2.koop(g2);
     p2.koop(g1);
     p3.koop(g3);
-    
+
     // Druk personen p1, p2 en p3 nu af naar de console
     cout << "\np1:" << p1 << endl;
     cout << "\np2:" << p2 << endl;
