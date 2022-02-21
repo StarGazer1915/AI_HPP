@@ -25,12 +25,10 @@ vector<vector<int>> distributionPass(int indx, vector<int> n, vector<vector<int>
     number in these "buckets" it then returns the vector arr.
     */
     int exp = pow(10, indx);
-    for (int num : n) {
-        if (to_string(num).length() >= indx) {
-            arr[getFirstDigit(num % exp)].push_back(num);
-        } else {
-            arr[0].push_back(num);
-        }
+    for(float num : n)
+    {   
+        int first_num = (int(num) % exp / (exp / 10));
+        arr[first_num].push_back(num);
     }
     return arr;
 }
@@ -70,7 +68,7 @@ int main() {
     The main function. An input vector is defined, then the bucketsort function is started and
     its output is "printed".
     */
-    vector<int> n = {103, 24, 62, 51, 49, 13, 489, 247, 0, 4};
+    vector<int> n = {103, 113, 24, 62, 51, 49, 13, 489, 247, 0, 4, 41, 19, 2489, 4245247, 1245247, 4045246};
     
     for (int i : bucketSort(n)) {
         cout << to_string(i) << endl;
