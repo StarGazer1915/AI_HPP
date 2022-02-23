@@ -1,12 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <math.h>
 #include <chrono>
 
 using std::vector, std::to_string, std::cout, std::endl;
 using namespace std::chrono;
 
-vector<vector<int>> distributionPass(int indx, vector<int> n, vector<vector<int>> arr) {
+vector<vector<double>> distributionPass(int indx, vector<int> n, vector<vector<double>> arr) {
     /*
     This function applies the distribution pass. The reason we change it to a double is because when we use 
     103 for example we get 1.03 which we then turn into an int again so we get 1. It will then take that 
@@ -15,21 +16,21 @@ vector<vector<int>> distributionPass(int indx, vector<int> n, vector<vector<int>
     for those (-4 + 10 becomes 6 which we can use as index). After putting all the numbers in these "buckets" it then 
     returns the vector arr.
     */
-    int exp = pow(10, indx+1);
-    for(double num : n) {   
-        int first_num = (int(num) % exp / (exp / 10));
+    double exp = pow(10, indx+1);
+    for(double num : n) {
+        int first_num = (fmod(num, exp) / (exp / 10));
         arr[first_num + 10].push_back(num);
     }
     return arr;
 }
 
-vector<int> gatheringPass(vector<vector<int>> arr) {
+vector<int> gatheringPass(vector<vector<double>> arr) {
     /*
     This function applies the gathering pass. It takes all the sorted values that have been placed
     in buckets and and places them back into a vector. After placing all numbers into the vector new_n it then returns it.
     */
     vector<int> new_n = {};
-    for (vector<int> v : arr) {
+    for (vector<double> v : arr) {
         for (int num : v) {
             new_n.push_back(num);
         }
@@ -43,16 +44,13 @@ vector<int> bucketSort(vector<int> n) {
     is determined (so that we know how long a number can really get inside the vector (max 9 numbers long)). 
     It then starts the for-loop that does the sorting. It then returns the now sorted vector.
     */
-    vector<vector<int>> arr = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
-    int bigNumLen = to_string(*max_element(n.begin(), n.end())).length();
-    if (bigNumLen >= 10) {
-        return n;
-    } else {
-        for (int i = 0; i < bigNumLen ; i++) {
+    vector<vector<double>> arr = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
+    double bigNumLen = to_string(*max_element(n.begin(), n.end())).length();
+    
+    for (int i = 0; i < bigNumLen ; i++) {
         n = gatheringPass(distributionPass(i, n, arr));
-        }
-        return n;
     }
+    return n;
 }
 
 vector<int> random_vector(int seed, int num_of_rands) {
@@ -63,8 +61,7 @@ vector<int> random_vector(int seed, int num_of_rands) {
     vector<int> randVector;
     srand(seed);
     for (int i = 0 ; i < num_of_rands ; i++) {
-        int exp = pow(10, 9);
-        randVector.push_back(rand() % exp);
+        randVector.push_back(rand());
     }
     return randVector;
 }
@@ -77,23 +74,16 @@ int main() {
     */
 
    // Creating the input vector for bucket sort //
-    vector<int> rdm = random_vector(1707815, 10);
+    vector<int> rdm = random_vector(1707815, 100000000);
 
     // Execution and time measurement //
-    auto start = high_resolution_clock::now();
+    for (int i = 0 ; i < 7 ; i++) {
+        auto start = high_resolution_clock::now();
+        vector<int> result = bucketSort(rdm);
 
-    vector<int> result = bucketSort(rdm);
-
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    // Showing results //
-    // cout << "\nResult: " << endl;
-
-    // for (int i : result) {
-    //     cout << to_string(i) << endl;
-    // }
-
-    // Showing duration //
-    cout << "\nTotal duration: " << duration.count() << " microseconds" << endl;
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << duration.count() << endl;
+    }
 }
+    
