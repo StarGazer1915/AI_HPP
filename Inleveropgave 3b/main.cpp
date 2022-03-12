@@ -5,7 +5,7 @@
 
 using std::cout, std::endl, std::to_string, std::vector, std::thread;
 
-vector<int> merge_sort_iterative(vector<int> xs, int num_of_threads) {
+vector<int> merge_sort_iterative(vector<int> xs) {
     /*
     In-place merge sort of vector without recursion. The basic idea
     is to avoid the recursive call while using an iterative solution.
@@ -73,41 +73,61 @@ vector<int> merge_sorted_arrays(vector<int> array1, vector<int> array2) {
                 vector<int> new_arr = merge_sorted_arrays(array1, tail2);
                 header2.insert(header2.end(), new_arr.begin(), new_arr.end());
                 return header2;
-            }  
+            }
         }
-    }   
+    }
 }
 
+vector<vector<int>> slice_vector(vector<int> xs, int num_of_threads) {
+    int part = xs.size() / num_of_threads / 2;
+    vector<vector<int>> sliced_vector;
+
+    for (int slice = 0 ; slice < xs.size() ; slice += part) {
+        vector<int> v_part(xs.begin() + slice, xs.begin() + slice + part);
+
+        for (int i : v_part) {
+            cout << to_string(i) << endl;
+        }
+        cout << "\n" << endl;
+
+        sliced_vector.push_back(v_part);
+    }
+    // cout << "XS vector size = " << to_string(xs.size()) << endl;
+    // cout << "Amount of threads = " << to_string(num_of_threads) << endl;
+    // cout << "Sliced vector size = " << to_string(sliced_vector.size()) << endl;
+    // cout << "Part = " << to_string(part) << endl;
+
+    return sliced_vector;
+}
+
+
 vector<int> sort_and_merge(vector<int> array1, vector<int> array2) {
-    return vector<int>{};
+    vector<int> sorted_ar1 = merge_sort_iterative(array1);
+    vector<int> sorted_ar2 = merge_sort_iterative(array2);
+    return merge_sorted_arrays(array1, array2);
 }
 
 vector<int> multi_thread_merge_sort(vector<int> xs, int num_of_threads) {
-    int part = xs.size() / num_of_threads;
+    vector<vector<int>> sliced_vector = slice_vector(xs, num_of_threads);
     thread thr[num_of_threads];
-    vector<vector<int>> sliced_vector;
-
-    for (int slice = 0 ; slice < num_of_threads ; slice += part) {
-        vector<int> v_part(xs.begin() + slice, xs.begin() + slice + part - 1);
-        sliced_vector.push_back(v_part);
-    }
 
     int t = 0;
-    while (sliced_vector.size() != 1) {
-        for (int i = 0 ; i < sliced_vector.size() ; i += 2) {
-            thr[t] = thread(sort_and_merge, sliced_vector[i], sliced_vector[i+1]);
-        }
-        for (int t = 0; t < num_of_threads; t++) {
-            thr[t].join();
-        }      
+    for (int i = 0 ; i < sliced_vector.size() ; i += 2) {
+        thr[t] = thread(sort_and_merge, sliced_vector[i], sliced_vector[i+1]);
+        // cout << "\nStarted thread: " << to_string(t) << endl;
+        t++;
     }
-    return sliced_vector[0];    
+    for (int i = 0 ; i < num_of_threads ; i++) {
+        thr[i].join();
+        // cout << "\nJoined thread: " << to_string(i) << endl;
+    }
+    return sliced_vector[0];
 }
 
 
 int main() {
 
-    vector<int> input = {12, 902, -3, 85, 93, -24, 7, 432};
+    vector<int> input = {12, 902, -3, 85, 93, -24, 7, 432, 18, 42, -31, 443, 84, 101, 1002, 1};
     vector<int> result = multi_thread_merge_sort(input, 4);
 
     for (int i : result) {
