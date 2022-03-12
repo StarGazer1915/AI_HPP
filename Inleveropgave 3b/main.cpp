@@ -2,9 +2,9 @@
 #include <vector>
 #include <thread>
 
-using std::cout, std::endl, std::to_string, std::vector;
+using std::cout, std::endl, std::to_string, std::vector, std::thread;
 
-vector<int> merge_sort(vector<int> xs, int num_of_threads) {
+vector<int> merge_sort_iterative(vector<int> xs, int num_of_threads) {
     /*
     In-place merge sort of vector without recursion. The basic idea
     is to avoid the recursive call while using an iterative solution.
@@ -35,35 +35,87 @@ vector<int> merge_sort(vector<int> xs, int num_of_threads) {
         }
         unit *= 2;
     }
-    for (int i : xs) {
-        cout << to_string(i) << endl;
-    }
     return xs;
 }
 
-vector<int> merge_arrays(vector<int> start, vector<int> array1, vector<int> array2) {
-    // when both still have elements
-    int head1 = array1[0];
-    int head2 = array2[0];
-    vector<int> tail1 = vector<int>(array1.begin() + 1, array1.end());
-    vector<int> tail2 = vector<int>(array2.begin() + 1, array2.end());
-    if (head1 < head2) {
-        return vector<int>{head1} + merge_arrays(start, tail1, array2); // and merge with the remainder
-    } else {
-        return vector<int>{head2} + merge_arrays(start, array1, tail2); // idem for when array 2 had the smaller element
+vector<int> merge_sorted_arrays(vector<int> array1, vector<int> array2) {
+    if (array1.size() == 0 && array2.size() == 0) {
+        return vector<int> {};
+    } else { 
+        if (array1.size() == 0) {
+            vector<int> header2 = {array2[0]};
+            vector<int> tail2(array2.begin() + 1, array2.end());
+            
+            vector<int> new_arr = merge_sorted_arrays(array1, tail2);
+            header2.insert(header2.end(), new_arr.begin(), new_arr.end());
+
+            return header2;
+        } else if (array2.size() == 0) {
+            vector<int> header1 = {array1[0]};
+            vector<int> tail1(array1.begin()+1, array1.end());
+            vector<int> new_arr = merge_sorted_arrays(tail1, array2);
+
+            header1.insert(header1.end(), new_arr.begin(), new_arr.end());
+            return header1;
+            
+        } else {
+            vector<int> header1 = {array1[0]};
+            vector<int> header2 = {array2[0]};
+            vector<int> tail1(array1.begin() + 1, array1.end());
+            vector<int> tail2(array2.begin() + 1, array2.end());
+
+            if (header1[0] < header2[0]) {   
+                vector<int> new_arr = merge_sorted_arrays(tail1, array2);
+                header1.insert(header1.end(), new_arr.begin(), new_arr.end());
+                return header1;
+            } else {
+                vector<int> new_arr = merge_sorted_arrays(array1, tail2);
+                header2.insert(header2.end(), new_arr.begin(), new_arr.end());
+                return header2;
+            }  
+        }
     }   
+}
+
+vector<int> sort_and_merge(vector<int> array1, vector<int> array2) {
+    return vector<int>{};
+}
+
+vector<int> multi_thread_merge_sort(vector<int> xs, int num_of_threads) {
+    int part = xs.size() / num_of_threads;
+    thread thr[num_of_threads];
+    vector<vector<int>> sliced_vector;
+
+    int slice = 0;
+    for (int i = 0 ; i < num_of_threads ; i++) {
+        vector<int> v_part(xs.begin() + slice, xs.begin() + slice + part);
+        sliced_vector.push_back(v_part);
+        slice += part;
+    }
+
+    for (int i = 0 ; sliced_vector.size() == 1 ; i++) {
+        thr[t] = thread(sort_and_merge, sliced_vector[i], sliced_vector[i+1])
+
+
+    }
+    for (int i = 0 ; i < sliced_vector.size() ; i += 2) {
+        thr[t] = thread(sort_and_merge, sliced_vector[i], sliced_vector[i+1])
+    }
+
+
+    for (t = 0; t < num_of_threads; t++)
+    {
+        thr[t].join();
+    }
 }
 
 
 int main() {
 
     vector<int> input = {12, 902, -3, 85, 93, -24, 7, 432};
+    vector<int> result = merge_sorted_arrays(input1, input2);
 
-    vector<int> start = {};
-    vector<int> input1 = {-3, 12, 85, 902};
-    vector<int> input2 = {-24, 7, 93, 432};
-    
-    std::thread worker(merge_arrays, start, input1, input2);
-    
-    worker.join();
+    for (int i : result) {
+        cout << to_string(i) << endl;
+    }
 }
