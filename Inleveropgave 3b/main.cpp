@@ -84,19 +84,8 @@ vector<vector<int>> slice_vector(vector<int> xs, int num_of_threads) {
 
     for (int slice = 0 ; slice < xs.size() ; slice += part) {
         vector<int> v_part(xs.begin() + slice, xs.begin() + slice + part);
-
-        for (int i : v_part) {
-            cout << to_string(i) << endl;
-        }
-        cout << "\n" << endl;
-
         sliced_vector.push_back(v_part);
     }
-    // cout << "XS vector size = " << to_string(xs.size()) << endl;
-    // cout << "Amount of threads = " << to_string(num_of_threads) << endl;
-    // cout << "Sliced vector size = " << to_string(sliced_vector.size()) << endl;
-    // cout << "Part = " << to_string(part) << endl;
-
     return sliced_vector;
 }
 
@@ -121,7 +110,7 @@ vector<int> multi_thread_merge_sort(vector<int> xs, int num_of_threads) {
         thr[i].join();
         // cout << "\nJoined thread: " << to_string(i) << endl;
     }
-    return sliced_vector[0];
+    return result;
 }
 
 
