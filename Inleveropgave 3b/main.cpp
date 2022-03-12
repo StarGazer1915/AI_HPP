@@ -3,7 +3,7 @@
 #include <thread>
 #include <future>
 
-using std::cout, std::endl, std::to_string, std::vector, std::thread;
+using std::cout, std::endl, std::to_string, std::vector, std::thread, std::future, std::launch;
 
 vector<int> merge_sort_iterative(vector<int> xs) {
     /*
@@ -89,7 +89,6 @@ vector<vector<int>> slice_vector(vector<int> xs, int num_of_threads) {
     return sliced_vector;
 }
 
-
 vector<int> sort_and_merge(vector<int> array1, vector<int> array2) {
     vector<int> sorted_ar1 = merge_sort_iterative(array1);
     vector<int> sorted_ar2 = merge_sort_iterative(array2);
@@ -98,25 +97,23 @@ vector<int> sort_and_merge(vector<int> array1, vector<int> array2) {
 
 vector<int> multi_thread_merge_sort(vector<int> xs, int num_of_threads) {
     vector<vector<int>> sliced_vector = slice_vector(xs, num_of_threads);
-    thread thr[num_of_threads];
 
-    int t = 0;
-    for (int i = 0 ; i < sliced_vector.size() ; i += 2) {
-        thr[t] = thread(sort_and_merge, sliced_vector[i], sliced_vector[i+1]);
-        // cout << "\nStarted thread: " << to_string(t) << endl;
-        t++;
-    }
-    for (int i = 0 ; i < num_of_threads ; i++) {
-        thr[i].join();
-        // cout << "\nJoined thread: " << to_string(i) << endl;
-    }
-    return result;
+    future<vector<int>> thr_0 = async(launch::async, &sort_and_merge, sliced_vector[0], sliced_vector[1]);
+    future<vector<int>> thr_1 = async(launch::async, &sort_and_merge, sliced_vector[2], sliced_vector[3]);
+    future<vector<int>> thr_2 = async(launch::async, &sort_and_merge, sliced_vector[4], sliced_vector[5]);
+    future<vector<int>> thr_3 = async(launch::async, &sort_and_merge, sliced_vector[6], sliced_vector[7]);
+
+    future<vector<int>> thr_4 = async(launch::async, &sort_and_merge, thr_0.get(), thr_1.get());
+    future<vector<int>> thr_5 = async(launch::async, &sort_and_merge, thr_2.get(), thr_3.get());
+
+    future<vector<int>> thr_6 = async(launch::async, &sort_and_merge, thr_4.get(), thr_5.get());
+    
+    return thr_6.get();
 }
-
 
 int main() {
 
-    vector<int> input = {12, 902, -3, 85, 93, -24, 7, 432, 18, 42, -31, 443, 84, 101, 1002, 1};
+    vector<int> input = {12, 902, 3, 85, 93, 250, 7, 432, 18, 42, 31, 443, 84, 101, 24, 95};
     vector<int> result = multi_thread_merge_sort(input, 4);
 
     for (int i : result) {
