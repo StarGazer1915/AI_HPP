@@ -5,6 +5,10 @@
 using std::cout, std::endl, std::to_string, std::vector, std::future, std::launch;
 
 vector<int> merge_arrays(vector<int> array1, vector<int> array2) {
+    /*
+    Merges two vector arrays into one. It chooses what the head will
+    be (smallest number) and sorts it while merging in the recursive_merge_sort() function.
+    */
     if (array1.size() == 0 && array2.size() == 0) {
         return vector<int> {};
     } else {
@@ -44,6 +48,11 @@ vector<int> merge_arrays(vector<int> array1, vector<int> array2) {
 }
 
 vector<int> recursive_merge_sort(vector<int> xs) {
+    /*
+    Continuously splits and sorts the array. It keeps splitting until it's been split to two
+    single elements and then recursively merges the array and sorts the elements by using the
+    merge_arrays() function.
+    */
     if (xs.size() == 1) {
         return xs;
     } else {
@@ -55,6 +64,10 @@ vector<int> recursive_merge_sort(vector<int> xs) {
 }
 
 vector<vector<int>> slice_vector(vector<int> xs, int num_of_threads) {
+    /*
+    Divides a vector into slices/parts for each thread.
+    So the vector will be split into four subvectors should the num_of_threads be 4.
+    */
     int part = xs.size() / num_of_threads;
     vector<vector<int>> sliced_vector;
 
@@ -65,8 +78,13 @@ vector<vector<int>> slice_vector(vector<int> xs, int num_of_threads) {
     return sliced_vector;
 }
 
-vector<int> multi_thread_merge_sort(vector<int> xs, int num_of_threads) {
-    vector<vector<int>> sliced_vector = slice_vector(xs, num_of_threads);
+vector<int> multi_thread_merge_sort(vector<int> xs) {
+    /*
+    Firstly it slices the vector into the desired amount of subvectors (4).
+    These are then given to the asyncs that run the recursive_merge_sort() function multithreaded.
+    When all the threads/asyncs are finished the new arrays are combined and then merged a final time.
+    */
+    vector<vector<int>> sliced_vector = slice_vector(xs, 4);
 
     future<vector<int>> thr_0 = async(launch::async, &recursive_merge_sort, sliced_vector[0]);
     future<vector<int>> thr_1 = async(launch::async, &recursive_merge_sort, sliced_vector[1]);
@@ -94,7 +112,7 @@ int main() {
 
     vector<int> input = {12, 902, 3, 85, 93, -250, 7, -432, 18, 42, 31, 443, 84, 101, 24, 95};
     vector<int> ran_input = random_vector(1707815, 2000);
-    vector<int> result = multi_thread_merge_sort(ran_input, 4);
+    vector<int> result = multi_thread_merge_sort(ran_input);
 
     for (int i : result) {
         cout << to_string(i) << endl;
