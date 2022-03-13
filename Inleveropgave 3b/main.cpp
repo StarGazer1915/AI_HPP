@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <future>
+#include <chrono>
 
 using std::cout, std::endl, std::to_string, std::vector, std::future, std::launch;
+using namespace std::chrono;
 
 vector<int> merge_arrays(vector<int> array1, vector<int> array2) {
     /*
@@ -111,10 +113,15 @@ vector<int> random_vector(int seed, int num_of_rands) {
 int main() {
 
     vector<int> input = {12, 902, 3, 85, 93, -250, 7, -432, 18, 42, 31, 443, 84, 101, 24, 95};
-    vector<int> ran_input = random_vector(1707815, 2000);
-    vector<int> result = multi_thread_merge_sort(ran_input);
+    vector<int> ran_input = random_vector(1707815, 500);
 
-    for (int i : result) {
-        cout << to_string(i) << endl;
+    // Execution and time measurement //
+    for (int i = 0 ; i < 7 ; i++) {
+        auto start = high_resolution_clock::now();
+        vector<int> result = multi_thread_merge_sort(ran_input);
+
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << duration.count() << endl;
     }
 }
