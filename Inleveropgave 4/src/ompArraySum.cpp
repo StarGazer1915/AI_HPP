@@ -12,12 +12,13 @@ using std::cout, std::endl, std::thread, std::vector;
 void readArray(char *fileName, double **a, int *n);
 double sumArray(double *a, int numValues);
 
-int main(int argc, char *argv[], int num_of_threads)
+int main(int argc, char *argv[])
 {
     int howMany;
-    double sum;
+    double sum = 0;
     double *a;
-    omp_set_num_threads(num_of_threads);
+    int thread_sum[4];
+    omp_set_num_threads(4);
     double start = omp_get_wtime();
 
     if (argc != 2)
@@ -26,23 +27,34 @@ int main(int argc, char *argv[], int num_of_threads)
         exit(1);
     }
 
-    
+    // SERIAL IMPLEMENTATION
+    readArray(argv[1], &a, &howMany);
+    sum = sumArray(a, howMany);
 
-    #pragma omp master
+    printf("\nSerial Version: %f", sum);
+
+    // PARALLEL IMPLEMENTATION
+    sum = 0;
+    readArray(argv[1], &a, &howMany);
+    #pragma omp parallel reduction (+:sum)
     {
-        // vector<vector<int>> sliced_vector = slice_vector(&a, 4);
-        #pragma omp parallel for
+        int ID = omp_get_thread_num();
+        thread_sum[ID] = 0;
         
-        sum = sumArray(a, howMany);
-        cout << "The sum of the values in the input file '" << argv[1] << "' is " << sum << endl;
-
-
-
+        #pragma omp for
+        for (int i = 0; i < 10000; i++) {
+            thread_sum[ID] += a[i];
+        }
     }
+    // for (int i = 0; i < 4; i++) {
+    //     sum += thread_sum[i];
+    // }
     
+    printf("\nParallel Version: %f", sum);
+    // cout << "The sum of the values in the input file '" << argv[1] << "' is " << sum << endl;
     
     double end = omp_get_wtime();
-    cout << "Elasped time = " << (end - start) << " sec" << endl;
+    cout << "\nElasped time = " << (end - start) << " sec" << endl;
     
     free(a);
     return 0;
