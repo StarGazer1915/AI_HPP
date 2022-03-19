@@ -32,11 +32,11 @@ int main(int argc, char *argv[])
         for (int i = 0; i < howMany; i++) {
             sum += a[i];
         }
-        cout << "\nThe sum of the values in the input file '" << argv[1] << "' is " << sum << endl;
-    
-        double end = omp_get_wtime();
-        cout << "Elasped time = " << (end - start) << " sec\n" << endl;
     }
+
+    cout << "\nThe sum of the values in the input file '" << argv[1] << "' is " << sum << endl;
+    double end = omp_get_wtime();
+    cout << "Elasped time = " << (end - start) << " sec\n" << endl;
     
     free(a);
     return 0;
