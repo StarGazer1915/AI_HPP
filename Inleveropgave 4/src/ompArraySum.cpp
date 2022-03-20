@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     int howMany;
     double sum = 0;
     double *a;
-    omp_set_num_threads(2);
+    omp_set_num_threads(4);
     double start = omp_get_wtime();
 
     if (argc != 2)
