@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     double sum = 0;
     double *a;
     omp_set_num_threads(4);
-    double start = omp_get_wtime();
 
     if (argc != 2)
     {
@@ -28,15 +27,17 @@ int main(int argc, char *argv[])
     #pragma omp master
     {
         readArray(argv[1], &a, &howMany);
+        double start = omp_get_wtime();
         #pragma omp parallel for reduction (+:sum)
         for (int i = 0; i < howMany; i++) {
             sum += a[i];
         }
+        double end = omp_get_wtime();
+        printf("%f10", end - start);
+        cout << "\nElasped time = " << (end - start) << " sec" << endl;
     }
 
     cout << "\nThe sum of the values in the input file '" << argv[1] << "' is " << sum << endl;
-    double end = omp_get_wtime();
-    cout << "Elasped time = " << (end - start) << " sec\n" << endl;
     
     free(a);
     return 0;
