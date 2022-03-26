@@ -32,30 +32,38 @@ int checkCircuit(int, bool *);
 
 int main (int argc, char *argv[])
 {
-   unsigned int i, combination; // loop variable (32 bits)
-   int id = -1;                 // process id
-   int count = 0;        // number of solutions
+   unsigned int i, combination;  // loop variable (32 bits)
+   int rank, comm_size;          // process id
+   int count = 0;                // number of solutions
+   int reducedCount = 0;
 
    bool *v = (bool *)malloc(sizeof(bool) * SIZE); /* Each element is one of the 32 bits */
-
-   cout << endl << "Process " << id << " is checking the circuit..." << endl;
 
    double startTime = 0.0, totalTime = 0.0;
    startTime = MPI_Wtime();
 
+   MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
+
+   cout << endl << "Process " << rank << " is checking the circuit..." << endl;
+
    for (combination = 0; combination < UINT_MAX; combination++)
    {
+      if (combination%comm_size != rank) continue;
+
       for (i = 0; i < SIZE; i++)
          v[i] = EXTRACT_BIT(combination, i);
 
-      count += checkCircuit(id, v);
+      count += checkCircuit(rank, v);
    }
-   
-   totalTime = MPI_Wtime() - startTime;
-   cout << "Process " << id << " finished in " << totalTime << " seconds." << endl;
 
-   cout << "Process " << id << " finished." << endl;
-   cout << "A total of " << count << " solutions were found." << endl << endl;
+   MPI_Reduce(&count, &reducedCount, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+   MPI_Finalize();
+
+   totalTime = MPI_Wtime() - startTime;
+   cout << "Process " << rank << " finished in " << totalTime << " seconds." << endl;
+   cout << "A total of " << reducedCount << " solutions were found." << endl << endl;
    return 0;
 }
 
